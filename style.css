@@ -1,49 +1,122 @@
-body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: #f9f9f9;
+/* Reset some basics */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #f0f2f5, #e6ecf0);
     color: #333;
+    line-height: 1.6;
   }
   
-  .container {
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  h1 {
+  /* Header styling */
+  header {
+    background: #0066cc;
+    color: #fff;
     text-align: center;
-    color: #444;
+    padding: 30px 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }
   
+  header h1 {
+    font-size: 2.5rem;
+  }
+  
+  header p {
+    margin-top: 10px;
+    font-size: 1.1rem;
+  }
+  
+  /* Main container */
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Section titles */
   .section {
-    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+  .section {
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-radius: 10px;
+    padding: 25px;
+    background-color: #f8f9fa;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
   }
   
-  input[type="file"], input[type="number"] {
-    display: block;
-    margin: 10px 0;
+  /* Separation between sections */
+  .section + .section {
+    margin-top: 60px;
+    border-top: 2px dashed #ccc;
+    padding-top: 40px;
+  }
+  
+  
+  .section h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  /* File input and buttons */
+  input[type="file"],
+  input[type="number"] {
+    padding: 10px;
+    margin: 10px 0 15px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    font-size: 1rem;
+  }
+  
+  .range-input {
+    margin-top: 10px;
+  }
+  
+  .range-input input {
+    width: 120px;
+    margin-right: 10px;
   }
   
   button {
-    padding: 8px 14px;
-    margin-top: 5px;
-    margin-right: 10px;
-    background-color: #007BFF;
-    border: none;
+    background-color: #28a745;
     color: white;
+    padding: 10px 18px;
+    margin-top: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 4px;
+    transition: background-color 0.3s ease;
   }
   
   button:hover {
-    background-color: #0056b3;
+    background-color: #218838;
   }
   
   .options {
-    margin-top: 10px;
+    margin-top: 20px;
+  }
+  
+  /* Footer styling */
+  footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #003366;
+    color: white;
+    font-size: 0.9rem;
+    margin-top: 50px;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
   }
   

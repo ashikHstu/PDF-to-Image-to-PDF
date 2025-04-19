@@ -7,29 +7,46 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>PDF ↔ Image Converter</h1>
 
+  <!-- 🌟 Header -->
+  <header>
+    <h1>📄 PDF ↔ Image Converter</h1>
+    <p>Convert PDF to Images and Images to PDF with ease</p>
+    <p>NB: This site is under construction. Please contact with Ashik for update.</p>
+  </header>
+
+  <!-- 🧰 Main Container -->
+  <div class="container">
+
+    <!-- PDF to Image Section -->
     <div class="section">
-      <h2>PDF to Image</h2>
+      <h2>🧾 PDF to Image</h2>
       <input type="file" id="pdfInput" accept="application/pdf" />
+
       <div class="options">
-        <button onclick="downloadAllPages()">Download All Pages as Images</button>
-        <div>
-          <label>Page Range: </label>
-          <input type="number" id="startPage" placeholder="Start" min="1"/>
-          <input type="number" id="endPage" placeholder="End" min="1"/>
+        <button onclick="downloadAllPages()">📥 Download All Pages as Images</button>
+        <div class="range-input">
+          <label>Or download specific pages:</label>
+          <input type="number" id="startPage" placeholder="Start Page" min="1"/>
+          <input type="number" id="endPage" placeholder="End Page" min="1"/>
           <button onclick="downloadPageRange()">Download Range</button>
         </div>
       </div>
     </div>
 
+    <!-- Image to PDF Section -->
     <div class="section">
-      <h2>Image to PDF</h2>
+      <h2>🖼️ Image to PDF</h2>
       <input type="file" id="imageInput" accept="image/*" multiple />
-      <button onclick="convertImagesToPDF()">Convert to PDF</button>
+      <button onclick="convertImagesToPDF()">📄 Convert Images to PDF</button>
     </div>
+
   </div>
+
+  <!-- 🔚 Footer -->
+  <footer>
+    <p>&copy; 2025 Ashikur Rahman Bhuyain. All rights reserved.</p>
+  </footer>
 
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>

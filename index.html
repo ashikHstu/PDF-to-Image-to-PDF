@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF ↔ Image Converter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>PDF ↔ Image Converter</h1>
+
+    <div class="section">
+      <h2>PDF to Image</h2>
+      <input type="file" id="pdfInput" accept="application/pdf" />
+      <div class="options">
+        <button onclick="downloadAllPages()">Download All Pages as Images</button>
+        <div>
+          <label>Page Range: </label>
+          <input type="number" id="startPage" placeholder="Start" min="1"/>
+          <input type="number" id="endPage" placeholder="End" min="1"/>
+          <button onclick="downloadPageRange()">Download Range</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Image to PDF</h2>
+      <input type="file" id="imageInput" accept="image/*" multiple />
+      <button onclick="convertImagesToPDF()">Convert to PDF</button>
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

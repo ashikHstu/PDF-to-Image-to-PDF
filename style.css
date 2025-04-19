@@ -1,0 +1,49 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f9f9f9;
+    color: #333;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 {
+    text-align: center;
+    color: #444;
+  }
+  
+  .section {
+    margin-top: 40px;
+  }
+  
+  input[type="file"], input[type="number"] {
+    display: block;
+    margin: 10px 0;
+  }
+  
+  button {
+    padding: 8px 14px;
+    margin-top: 5px;
+    margin-right: 10px;
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .options {
+    margin-top: 10px;
+  }
+  

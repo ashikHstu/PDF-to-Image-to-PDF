@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF Merger</title>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    input {
+      margin: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Merge Two PDFs</h2>
+  <input type="file" id="pdf1" accept="application/pdf" />
+  <input type="file" id="pdf2" accept="application/pdf" />
+  <button onclick="mergePDFs()">Merge PDF</button>
+
+  <script>
+    async function mergePDFs() {
+      const pdf1File = document.getElementById("pdf1").files[0];
+      const pdf2File = document.getElementById("pdf2").files[0];
+
+      if (!pdf1File || !pdf2File) {
+        alert("Please select two PDF files.");
+        return;
+      }
+
+      const pdf1Bytes = await pdf1File.arrayBuffer();
+      const pdf2Bytes = await pdf2File.arrayBuffer();
+
+      const mergedPdf = await PDFLib.PDFDocument.create();
+
+      const pdf1Doc = await PDFLib.PDFDocument.load(pdf1Bytes);
+      const pdf2Doc = await PDFLib.PDFDocument.load(pdf2Bytes);
+
+      const pdf1Pages = await mergedPdf.copyPages(pdf1Doc, pdf1Doc.getPageIndices());
+      const pdf2Pages = await mergedPdf.copyPages(pdf2Doc, pdf2Doc.getPageIndices());
+
+      pdf1Pages.forEach((page) => mergedPdf.addPage(page));
+      pdf2Pages.forEach((page) => mergedPdf.addPage(page));
+
+      const mergedPdfBytes = await mergedPdf.save();
+
+      const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "merged.pdf";
+      link.click();
+    }
+  </script>
+
+</body>
+</html>

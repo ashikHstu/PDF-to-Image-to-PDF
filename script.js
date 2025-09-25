@@ -1,10 +1,12 @@
 let pdfDoc = null;
+let fileName = "";
 
 // Handle PDF Upload
 document.getElementById("pdfInput").addEventListener("change", function (e) {
   const file = e.target.files[0];
   if (!file || file.type !== "application/pdf") return;
-
+  
+  fileName = fileName = file.name.replace(/\.pdf$/i, "");
   const reader = new FileReader();
   reader.onload = function () {
     const typedArray = new Uint8Array(this.result);
@@ -40,7 +42,7 @@ async function downloadAllPages() {
 
   for (let i = 1; i <= pdfDoc.numPages; i++) {
     const { blob, pageNum } = await renderPageAsImage(i);
-    saveAs(blob, `page-${pageNum}.png`);
+    saveAs(blob, `${fileName}_page-${pageNum}.png`);
   }
 }
 
@@ -57,7 +59,7 @@ async function downloadPageRange() {
 
   for (let i = start; i <= end; i++) {
     const { blob, pageNum } = await renderPageAsImage(i);
-    saveAs(blob, `page-${pageNum}.png`);
+    saveAs(blob, `${fileName}_page-${pageNum}.png`);
   }
 }
 

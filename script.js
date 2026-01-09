@@ -1,101 +1,101 @@
-let pdfDoc = null;
-let fileName = "";
+const { PDFDocument } = PDFLib;
+const { jsPDF } = window.jspdf;
 
-// Handle PDF Upload
-document.getElementById("pdfInput").addEventListener("change", function (e) {
-  const file = e.target.files[0];
-  if (!file || file.type !== "application/pdf") return;
-  
-  fileName = fileName = file.name.replace(/\.pdf$/i, "");
-  const reader = new FileReader();
-  reader.onload = function () {
-    const typedArray = new Uint8Array(this.result);
-    pdfjsLib.getDocument(typedArray).promise.then(pdf => {
-      pdfDoc = pdf;
-      alert("PDF loaded! You can now choose to download all pages or a range.");
-    });
-  };
-  reader.readAsArrayBuffer(file);
-});
+/* ---------- PDF MERGER ---------- */
+async function mergePDFs() {
+  const f1 = document.getElementById("mergePdf1").files[0];
+  const f2 = document.getElementById("mergePdf2").files[0];
 
-// Convert and download specific page as image
-async function renderPageAsImage(pageNum) {
-  const page = await pdfDoc.getPage(pageNum);
-  const viewport = page.getViewport({ scale: 2 });
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
+  if (!f1 || !f2) return alert("Select two PDFs");
 
-  await page.render({ canvasContext: context, viewport }).promise;
+  const pdf1 = await PDFDocument.load(await f1.arrayBuffer());
+  const pdf2 = await PDFDocument.load(await f2.arrayBuffer());
 
-  return new Promise(resolve => {
-    canvas.toBlob(blob => {
-      resolve({ blob, pageNum });
-    }, "image/png");
-  });
+  const merged = await PDFDocument.create();
+
+  const p1 = await merged.copyPages(pdf1, pdf1.getPageIndices());
+  const p2 = await merged.copyPages(pdf2, pdf2.getPageIndices());
+
+  [...p1, ...p2].forEach(p => merged.addPage(p));
+
+  downloadPDF(await merged.save(), "merged.pdf");
 }
 
-// Download all pages
-async function downloadAllPages() {
-  if (!pdfDoc) return alert("Please upload a PDF first.");
+/* ---------- PDF SPLITTER ---------- */
+async function splitPDF() {
+  const file = document.getElementById("splitPdf").files[0];
+  const s = +document.getElementById("splitStart").value;
+  const e = +document.getElementById("splitEnd").value;
 
-  for (let i = 1; i <= pdfDoc.numPages; i++) {
-    const { blob, pageNum } = await renderPageAsImage(i);
-    saveAs(blob, `${fileName}_page-${pageNum}.png`);
+  if (!file || !s || !e || s > e) return alert("Invalid range");
+
+  const pdf = await PDFDocument.load(await file.arrayBuffer());
+  if (e > pdf.getPageCount()) return alert("Page out of range");
+
+  const newPdf = await PDFDocument.create();
+  for (let i = s - 1; i < e; i++) {
+    const [p] = await newPdf.copyPages(pdf, [i]);
+    newPdf.addPage(p);
+  }
+
+  const link = document.getElementById("splitDownload");
+  link.href = URL.createObjectURL(new Blob([await newPdf.save()], { type: "application/pdf" }));
+  link.download = `${file.name.replace(".pdf","")}_${s}-${e}.pdf`;
+  link.classList.remove("hidden");
+}
+
+/* ---------- PDF → IMAGE ---------- */
+async function downloadPDFImages() {
+  const file = document.getElementById("pdfToImageInput").files[0];
+  if (!file) return alert("Upload PDF");
+
+  const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+  const s = +document.getElementById("imgStart").value || 1;
+  const e = +document.getElementById("imgEnd").value || pdf.numPages;
+
+  for (let i = s; i <= e; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+    canvas.toBlob(b => downloadBlob(b, `page_${i}.png`));
   }
 }
 
-// Download specific range
-async function downloadPageRange() {
-  if (!pdfDoc) return alert("Please upload a PDF first.");
+/* ---------- IMAGE → PDF ---------- */
+async function imagesToPDF() {
+  const files = document.getElementById("imageInput").files;
+  if (!files.length) return alert("Select images");
 
-  const start = parseInt(document.getElementById("startPage").value);
-  const end = parseInt(document.getElementById("endPage").value);
-
-  if (isNaN(start) || isNaN(end) || start < 1 || end > pdfDoc.numPages || start > end) {
-    return alert("Invalid range!");
-  }
-
-  for (let i = start; i <= end; i++) {
-    const { blob, pageNum } = await renderPageAsImage(i);
-    saveAs(blob, `${fileName}_page-${pageNum}.png`);
-  }
-}
-
-// Image to PDF
-async function convertImagesToPDF() {
-  const input = document.getElementById("imageInput");
-  const files = input.files;
-
-  if (!files.length) return alert("Please select image files.");
-
-  const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
   for (let i = 0; i < files.length; i++) {
-    const imgData = await readFileAsDataURL(files[i]);
-    const img = new Image();
-    img.src = imgData;
-
-    await new Promise(resolve => {
-      img.onload = () => {
-        const width = pdf.internal.pageSize.getWidth();
-        const height = (img.height * width) / img.width;
-        if (i > 0) pdf.addPage();
-        pdf.addImage(img, "JPEG", 0, 0, width, height);
-        resolve();
-      };
-    });
+    const img = await fileToImage(files[i]);
+    if (i) pdf.addPage();
+    pdf.addImage(img, "JPEG", 10, 10, 190, 0);
   }
-
-  pdf.save("images_to_pdf.pdf");
+  pdf.save("images.pdf");
 }
 
-function readFileAsDataURL(file) {
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.readAsDataURL(file);
+/* ---------- HELPERS ---------- */
+function downloadPDF(bytes, name) {
+  downloadBlob(new Blob([bytes], { type: "application/pdf" }), name);
+}
+
+function downloadBlob(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+}
+
+function fileToImage(file) {
+  return new Promise(res => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.readAsDataURL(file);
   });
 }

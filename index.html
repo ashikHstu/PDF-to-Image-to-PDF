@@ -2,65 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>All-in-One PDF Tools</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PDF ↔ Image Converter</title>
+
   <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-  <!-- 🌟 Header -->
-  <header>
-    <h1>📄 PDF ↔ Image Converter</h1>
-    <p>Convert PDF to Images and Images to PDF with ease</p>
-    <p>NB: This site is under construction. Please contact with Ashik for update.</p>
-  </header>
-
-  <!-- 🧰 Main Container -->
-  <div class="container">
-
-    <div class="section">
-      <Header>
-  <h1>PDF Merger on different page</h1>
-  <a href="Needs/pdf_merger.html">PDF Merger</a>
-    <h1>PDF splitter on different page</h1>
-  <a href="PdfSplitter/index.html">PDF Splitter</a>
-</Header>
-    </div>
-    <!-- PDF to Image Section -->
-    <div class="section">
-      <h2>🧾 PDF to Image</h2>
-      <input type="file" id="pdfInput" accept="application/pdf" />
-
-      <div class="options">
-        <button onclick="downloadAllPages()">📥 Download All Pages as Images</button>
-        <div class="range-input">
-          <label>Or download specific pages:</label>
-          <input type="number" id="startPage" placeholder="Start Page" min="1"/>
-          <input type="number" id="endPage" placeholder="End Page" min="1"/>
-          <button onclick="downloadPageRange()">Download Range</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Image to PDF Section -->
-    <div class="section">
-      <h2>🖼️ Image to PDF</h2>
-      <input type="file" id="imageInput" accept="image/*" multiple />
-      <button onclick="convertImagesToPDF()">📄 Convert Images to PDF</button>
-    </div>
-
-  </div>
-
-  <!-- 🔚 Footer -->
-  <footer>
-    <p>&copy; 2025 Ashikur Rahman Bhuyain. All rights reserved.</p>
-    <a href="FormattingProject/index.html">Try new updating version</a>
-  </footer>
 
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="script.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>📄 All-in-One PDF Tools</h1>
+  <p>Merge • Split • PDF ↔ Image</p>
+</header>
+
+<div class="container">
+
+  <!-- PDF MERGER -->
+  <section class="card">
+    <h2>🔗 PDF Merger</h2>
+    <input type="file" id="mergePdf1" accept="application/pdf">
+    <input type="file" id="mergePdf2" accept="application/pdf">
+    <button onclick="mergePDFs()">Merge PDFs</button>
+  </section>
+
+  <!-- PDF SPLITTER -->
+  <section class="card">
+    <h2>✂️ PDF Splitter</h2>
+    <input type="file" id="splitPdf" accept="application/pdf">
+    <div class="row">
+      <input type="number" id="splitStart" placeholder="Start Page" min="1">
+      <input type="number" id="splitEnd" placeholder="End Page" min="1">
+    </div>
+    <button onclick="splitPDF()">Split PDF</button>
+    <a id="splitDownload" class="hidden">Download Split PDF</a>
+  </section>
+
+  <!-- PDF TO IMAGE -->
+  <section class="card">
+    <h2>🧾 PDF to Image</h2>
+    <input type="file" id="pdfToImageInput" accept="application/pdf">
+    <div class="row">
+      <input type="number" id="imgStart" placeholder="Start Page">
+      <input type="number" id="imgEnd" placeholder="End Page">
+    </div>
+    <button onclick="downloadPDFImages()">Download Images</button>
+  </section>
+
+  <!-- IMAGE TO PDF -->
+  <section class="card">
+    <h2>🖼️ Image to PDF</h2>
+    <input type="file" id="imageInput" accept="image/*" multiple>
+    <button onclick="imagesToPDF()">Convert to PDF</button>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 Ashikur Rahman Bhuyain</p>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>

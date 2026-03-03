@@ -80,6 +80,52 @@ async function imagesToPDF() {
   pdf.save("images.pdf");
 }
 
+/* ---------- PDF TO TEXT & IMAGES ---------- */
+async function extractPDFContent() {
+  const file = document.getElementById("pdfToTextImageInput").files[0];
+  if (!file) return alert("Upload PDF");
+
+  const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+  const zip = new JSZip();
+
+  // Extract text from all
+  let fullText = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const text = await page.getTextContent();
+    const pageText = text.items.map(item => item.str).join(" ");
+    fullText += `Page ${i}:\n${pageText}\n\n`;
+  }
+
+  // Add text file to zip
+  zip.file("extracted_text.txt", fullText);
+
+  // Extract images from all pages
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+
+    // Convert canvas to blob and add to zip
+    canvas.toBlob(blob => {
+      zip.file(`page_${i}.png`, blob);
+    });
+  }
+
+  // Generate and download zip after all images are added
+  setTimeout(async () => {
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const link = document.getElementById("pdfContentDownload");
+    link.href = URL.createObjectURL(zipBlob);
+    link.download = `${file.name.replace(".pdf","")}_content.zip`;
+    link.classList.remove("hidden");
+  }, 1000);
+}
+
 /* ---------- HELPERS ---------- */
 function downloadPDF(bytes, name) {
   downloadBlob(new Blob([bytes], { type: "application/pdf" }), name);

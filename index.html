@@ -11,6 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -57,6 +58,14 @@
     <h2>🖼️ Image to PDF</h2>
     <input type="file" id="imageInput" accept="image/*" multiple>
     <button onclick="imagesToPDF()">Convert to PDF</button>
+  </section>
+
+  <!-- PDF TO TEXT & IMAGES -->
+  <section class="card">
+    <h2>📄 PDF to Text & Images</h2>
+    <input type="file" id="pdfToTextImageInput" accept="application/pdf">
+    <button onclick="extractPDFContent()">Extract Content</button>
+    <a id="pdfContentDownload" class="hidden">Download ZIP</a>
   </section>
 
 </div>

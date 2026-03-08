@@ -126,6 +126,113 @@ async function extractPDFContent() {
   }, 1000);
 }
 
+/* ---------- PDF TO LATEX ---------- */
+async function convertPDFToLatex() {
+  const file = document.getElementById("pdfToLatexInput").files[0];
+  const s = +document.getElementById("latexStart").value || 1;
+  const e = +document.getElementById("latexEnd").value || 1;
+
+  if (!file) return alert("Upload PDF");
+  if (s < 1 || e < 1 || s > e) return alert("Invalid page range");
+
+  const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+  if (e > pdf.numPages) return alert(`PDF has only ${pdf.numPages} pages`);
+
+  const zip = new JSZip();
+  const projectName = file.name.replace(".pdf", "") + "_latex";
+
+  // Create main LaTeX document
+  let latexContent = `\\documentclass[12pt]{article}\n`;
+  latexContent += `\\usepackage{graphicx}\n`;
+  latexContent += `\\usepackage{geometry}\n`;
+  latexContent += `\\geometry{margin=1in}\n`;
+  latexContent += `\\usepackage{hyperref}\n`;
+  latexContent += `\\usepackage{caption}\n`;
+  latexContent += `\\usepackage{subcaption}\n`;
+  latexContent += `\\usepackage{float}\n`;
+  latexContent += `\\usepackage{setspace}\n`;
+  latexContent += `\\onehalfspacing\n`;
+  latexContent += `\n`;
+  latexContent += `\\title{${file.name.replace(".pdf", "")}}\n`;
+  latexContent += `\\author{Converted from PDF}\n`;
+  latexContent += `\\date{\\today}\n`;
+  latexContent += `\n`;
+  latexContent += `\\begin{document}\n`;
+  latexContent += `\\maketitle\n`;
+  latexContent += `\\tableofcontents\n`;
+  latexContent += `\\newpage\n`;
+  latexContent += `\n`;
+
+  // Process each page
+  for (let i = s; i <= e; i++) {
+    const page = await pdf.getPage(i);
+    
+    // Extract text content
+    const textContent = await page.getTextContent();
+    let pageText = textContent.items.map(item => item.str).join(" ");
+    
+    // Clean up text
+    pageText = pageText.replace(/&/g, "\\&");
+    pageText = pageText.replace(/%/g, "\\%");
+    pageText = pageText.replace(/\$/g, "\\$");
+    pageText = pageText.replace(/#/g, "\\#");
+    pageText = pageText.replace(/_/g, "\\_");
+    pageText = pageText.replace(/\^/g, "\\^{}");
+    pageText = pageText.replace(/{/g, "\\{");
+    pageText = pageText.replace(/}/g, "\\}");
+    pageText = pageText.replace(/~/g, "\\~{}");
+    pageText = pageText.replace(/\\/g, "\\textbackslash{}");
+    
+    // Add page section
+    latexContent += `\\section*{Page ${i}}\n`;
+    latexContent += `\\addcontentsline{toc}{section}{Page ${i}}\n`;
+    latexContent += `\n`;
+    
+    if (pageText.trim()) {
+      latexContent += `${pageText}\n`;
+      latexContent += `\n`;
+    }
+    
+    // Extract and add image
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+
+    canvas.toBlob(async (blob) => {
+      const imageName = `page_${i}.png`;
+      zip.file(`images/${imageName}`, blob);
+      
+      // Add image to LaTeX content
+      latexContent += `\\begin{figure}[H]\n`;
+      latexContent += `\\centering\n`;
+      latexContent += `\\includegraphics[width=\\textwidth]{images/${imageName}}\n`;
+      latexContent += `\\caption{Page ${i} from original PDF}\n`;
+      latexContent += `\\label{fig:page_${i}}\n`;
+      latexContent += `\\end{figure}\n`;
+      latexContent += `\n`;
+      
+      // Add page break if not the last page
+      if (i === e) {
+        latexContent += `\\end{document}\n`;
+        
+        // Add all files to zip
+        zip.file(`${projectName}.tex`, latexContent);
+        zip.file("README.md", `# ${projectName}\n\nThis LaTeX project was generated from ${file.name}.\n\nTo compile:\n1. Run 'pdflatex ${projectName}.tex' multiple times\n2. Or use Overleaf.com to upload and compile\n\nThe generated PDF should closely resemble the original.`);
+        
+        // Generate and download zip
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const link = document.getElementById("latexDownload");
+        link.href = URL.createObjectURL(zipBlob);
+        link.download = `${projectName}.zip`;
+        link.classList.remove("hidden");
+      }
+    });
+  }
+}
+
 /* ---------- HELPERS ---------- */
 function downloadPDF(bytes, name) {
   downloadBlob(new Blob([bytes], { type: "application/pdf" }), name);

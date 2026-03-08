@@ -68,6 +68,18 @@
     <a id="pdfContentDownload" class="hidden">Download ZIP</a>
   </section>
 
+  <!-- PDF TO LATEX -->
+  <section class="card">
+    <h2>🧮 PDF to LaTeX</h2>
+    <input type="file" id="pdfToLatexInput" accept="application/pdf">
+    <div class="row">
+      <input type="number" id="latexStart" placeholder="Start Page" min="1">
+      <input type="number" id="latexEnd" placeholder="End Page" min="1">
+    </div>
+    <button onclick="convertPDFToLatex()">Generate LaTeX</button>
+    <a id="latexDownload" class="hidden">Download LaTeX ZIP</a>
+  </section>
+
 </div>
 
 <footer>
